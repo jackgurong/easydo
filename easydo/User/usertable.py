@@ -1,5 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+@author: guqiuyang
+@description: 定义用户类相关的表
+@create time: 2018/12/02
+"""
+
+
+import json
 from sqlalchemy import Table, Column, Integer, String
-from sqlalchemy import MetaData, ForeignKey
+from sqlalchemy import MetaData, ForeignKey, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -71,3 +80,28 @@ class StockDealRecord(Base):
     s_document_create_time = Column(String(20))
     s_deal_finish_time = Column(String(20))
   
+
+class CreateTable(object):
+    """
+    建立User相关的表
+    """
+
+    def __init__(self, sql_json):
+        self.sql_json = sql_json
+
+    def create_table(self):
+        f = open(self.sql_json)
+        sql_dict = json.load(f)
+        engine = create_engine(
+            'mysql+pymysql://' +
+            sql_dict['user'] +
+            ':' +
+            sql_dict['password'] +
+            '@' +
+            sql_dict['host'] +
+            ':3306/' +
+            sql_dict['database'] +
+            '?charset=utf8')
+        print(sql_dict['user'])
+        Base.metadata.create_all(engine)
+        

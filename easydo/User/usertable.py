@@ -36,7 +36,7 @@ class UserAccount(Base):
 
     # 表的结构:
     u_account_no = Column(Integer, primary_key=True, autoincrement=True)
-    u_userid = Column(None, ForeignKey('UserInfo.u_userid'))
+    u_userid = Column(None, ForeignKey('userInfo.u_userid'))
     u_account_balance = Column(String(20))
     u_near_modif_time = Column(String(20))
 
@@ -50,7 +50,7 @@ class UserStock(Base):
     # 表的结构:
     u_stock_no = Column(Integer, primary_key=True, autoincrement=True)
     stock_number = Column(String(10))
-    u_account_no = Column(None, ForeignKey('UserAccount.u_accout_no'))
+    u_account_no = Column(None, ForeignKey('userAccount.u_account_no'))
     
 
 # 定义StockInformation对象:
@@ -61,7 +61,7 @@ class StockInformation(Base):
     # 表的结构:
     u_stock_no = Column(Integer, primary_key=True, autoincrement=True)
     stock_number = Column(String(10))
-    u_account_no = Column(None, ForeignKey('UserAccount.u_accout_no'))
+    u_account_no = Column(None, ForeignKey('userAccount.u_account_no'))
   
 # 定义StockDealRecord对象:
 class StockDealRecord(Base):
@@ -70,8 +70,8 @@ class StockDealRecord(Base):
 
     # 表的结构:
     u_deal_no = Column(Integer, primary_key=True, autoincrement=True)
-    s_stock_no = Column(None, ForeignKey('userStock.s_stock_no'))
-    u_account_no = Column(None, ForeignKey('UserAccount.u_accout_no'))
+    s_stock_no = Column(None, ForeignKey('userStock.u_stock_no'))
+    u_account_no = Column(None, ForeignKey('userAccount.u_account_no'))
     s_stock_price = Column(String(15))
     s_deal_number = Column(String(15))
     s_not_deal_number = Column(String(15))
@@ -100,8 +100,8 @@ class CreateTable(object):
             '@' +
             sql_dict['host'] +
             ':3306/' +
-            sql_dict['database'] +
-            '?charset=utf8')
-        print(sql_dict['user'])
+            sql_dict['database'],
+            encoding='utf-8',
+            echo=True)
         Base.metadata.create_all(engine)
         

@@ -23,10 +23,10 @@ class UserInfo(Base):
     # 表的结构:
     u_userid = Column(Integer, primary_key=True, autoincrement=True)
     u_userpassword = Column(String(20))
-    u_sex = Column(String(2))
-    u_birthday = Column(String(10))
+    u_sex = Column(String(10))
+    u_birthday = Column(String(20))
     u_mail = Column(String(20))
-    u_phonenumber = Column(String(12))
+    u_phonenumber = Column(String(20))
 
 
 # 定义UserAccount对象:
@@ -49,7 +49,7 @@ class UserStock(Base):
 
     # 表的结构:
     u_stock_no = Column(Integer, primary_key=True, autoincrement=True)
-    stock_number = Column(String(10))
+    stock_number = Column(String(20))
     u_account_no = Column(None, ForeignKey('userAccount.u_account_no'))
     
 
@@ -60,7 +60,7 @@ class StockInformation(Base):
 
     # 表的结构:
     u_stock_no = Column(Integer, primary_key=True, autoincrement=True)
-    stock_number = Column(String(10))
+    stock_number = Column(String(20))
     u_account_no = Column(None, ForeignKey('userAccount.u_account_no'))
   
 # 定义StockDealRecord对象:
@@ -72,11 +72,11 @@ class StockDealRecord(Base):
     u_deal_no = Column(Integer, primary_key=True, autoincrement=True)
     s_stock_no = Column(None, ForeignKey('userStock.u_stock_no'))
     u_account_no = Column(None, ForeignKey('userAccount.u_account_no'))
-    s_stock_price = Column(String(15))
-    s_deal_number = Column(String(15))
-    s_not_deal_number = Column(String(15))
-    s_deal_type = Column(String(8))
-    s_deal_state = Column(String(8))
+    s_stock_price = Column(String(20))
+    s_deal_number = Column(String(20))
+    s_not_deal_number = Column(String(20))
+    s_deal_type = Column(String(20))
+    s_deal_state = Column(String(20))
     s_document_create_time = Column(String(20))
     s_deal_finish_time = Column(String(20))
   

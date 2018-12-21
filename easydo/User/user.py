@@ -7,8 +7,10 @@
 
 import json
 import logging
-from usertable import UserInfo, UserAccount, UserStock
-from usertable import StockInformation, StockDealRecord, CreateTable
+import usertable
+# from usertable import UserInfo, UserAccount, UserStock
+#from usertable import StockInformation, StockDealRecord, CreateTable
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -18,10 +20,16 @@ class User(object):
     def __init__(self, user_json=None, sql_json=None):
         self.user_json = user_json
         self.sql_json = sql_json
-        CreateTable(self.sql_json).create_table()
+        usertable.CreateTable(self.sql_json).create_table()
 
     def LoadInfo(self): #辅助函数
         print('get user info from mysql')
+
+    def logger(self):
+        """日志函数"""
+        logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        log = logging.getLogger(__name__)
+        return log
 
     def session(self):
         """创建数据库连接的session"""
@@ -38,22 +46,24 @@ class User(object):
         return sion
 
     def register(self):
-        """用户注册模块"""
+        """用户注册"""
         f = open(self.user_json)
         user_dict = json.load(f)
-        qu = self.session().query(UserInfo).filter(UserInfo.u_phonenumber
-                       == user_dict['phone'])
+        session = self.session()
 
-        print("-"*20)
-        print(qu)
-        if qu is None:
-            ed_user = UserInfo(u_userpassword=user_dict['pwd'], u_sex=user_dict['sex'],
+        try:
+            self.session().query(usertable.UserInfo).filter(usertable.UserInfo.u_phonenumber
+                       == user_dict['phone']).one()
+            self.logger().info("该手机号码已注册")
+        except:
+            user = usertable.UserInfo(u_userpassword=user_dict['pwd'], u_sex=user_dict['sex'],
                                 u_birthday=user_dict['birthday'], u_mail=user_dict['mail'],
                                 u_phonenumber=user_dict['phone'])
-            self.session().add(ed_user)
-            self.session().close()
-        else:
-            pass
+            session.add(user)
+            session.commit()
+            session.close()
+            self.logger().info("用户注册成功")
+
         
     def SignOut(self, name, passwd):
         print('add a record to mysql')

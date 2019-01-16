@@ -22,7 +22,7 @@ class UserInfo(Base):
 
     # 表的结构:
     u_userid = Column(Integer, primary_key=True, autoincrement=True)
-    u_userpassword = Column(String(20))
+    u_userpassword = Column(String(64))
     u_sex = Column(String(10))
     u_birthday = Column(String(20))
     u_mail = Column(String(20))
@@ -104,4 +104,9 @@ class CreateTable(object):
             encoding='utf-8',
             echo=True)
         Base.metadata.create_all(engine)
+
+if __name__ == '__main__':
+    sql_json="E:\\Project\\easydo\\scripts\\sqlinfo.json"
+    CT = CreateTable(sql_json)
+    CT.create_table()
         

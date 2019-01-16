@@ -8,32 +8,30 @@
 import json
 import logging
 import usertable
-# from usertable import UserInfo, UserAccount, UserStock
-#from usertable import StockInformation, StockDealRecord, CreateTable
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from hashlib import sha1
 
 
 class User(object):
     
-    def __init__(self, user_json=None, sql_json=None):
-        self.user_json = user_json
+    def __init__(self, sql_json=None):
         self.sql_json = sql_json
-        usertable.CreateTable(self.sql_json).create_table()
 
     def LoadInfo(self): #辅助函数
         print('get user info from mysql')
 
     def logger(self):
         """日志函数"""
-        logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        logging.basicConfig(level = logging.INFO,format = 
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         log = logging.getLogger(__name__)
         return log
 
     def session(self):
         """创建数据库连接的session"""
         f = open(self.sql_json)
+
         sql_dict = json.load(f)
 
         engine = create_engine('mysql+pymysql://' + sql_dict['user'] +
@@ -45,9 +43,9 @@ class User(object):
         sion = DBSession()
         return sion
 
-    def register(self):
+    def register(self, user_json):
         """用户注册"""
-        f = open(self.user_json)
+        f = open(user_json)
         user_dict = json.load(f)
         session = self.session()
 
@@ -56,7 +54,9 @@ class User(object):
                        == user_dict['phone']).one()
             self.logger().info("该手机号码已注册")
         except:
-            user = usertable.UserInfo(u_userpassword=user_dict['pwd'], u_sex=user_dict['sex'],
+            user_pwd = sha1(user_dict['pwd'].encode('utf-8')).hexdigest()
+            print(user_pwd, len(user_pwd))
+            user = usertable.UserInfo(u_userpassword=user_pwd, u_sex=user_dict['sex'],
                                 u_birthday=user_dict['birthday'], u_mail=user_dict['mail'],
                                 u_phonenumber=user_dict['phone'])
             session.add(user)
@@ -65,19 +65,41 @@ class User(object):
             self.logger().info("用户注册成功")
 
         
-    def SignOut(self, name, passwd):
-        print('add a record to mysql')
+    def SignOut(self):
+        """用户退出"""
+        pass
     
-    def Login(self, name, passwd):
-        print('%s has login, passwd = %s' % (name, passwd))
+    def Login(self, user_json):
+        """用户登录"""
+        f = open(user_json)
+        user_dict = json.load(f)
+        user_input_pwd = sha1(user_dict['pwd'].encode('utf-8')).hexdigest()
+        # print(user_input_pwd)
+
+        try:
+            userinfo = self.session().query(usertable.UserInfo.u_userpassword).filter(
+                usertable.UserInfo.u_phonenumber == user_dict['phone'])
+            print(userinfo)
+            if userinfo.u_userpassword == user_input_pwd:
+                self.logger().info("登录成功")
+                return True
+            else:
+                self.logger().info("登录失败")
+        except:
+            self.logger().info("请检查账号密码是否出错")
 
     def DeleteUser(self, name, passwd):
         print('delete a user')
 
+    def test(self):
+        self.session().query(usertable.UserInfo)
+        self.session().close()
 
 if __name__ == '__main__':
-    user = User(user_json="E:\\Project\\easydo\\scripts\\userinfo.json", 
-                sql_json="E:\\Project\\easydo\\scripts\\sqlinfo.json")
-    user.register()
+    user_json="E:\\Project\\easydo\\scripts\\userinfo.json"
+    user = User(sql_json="E:\\Project\\easydo\\scripts\\sqlinfo.json")
+    #user.register(user_json)
+    #user.Login(user_json)
+    print(user.test())
     
     
